@@ -37,7 +37,7 @@ struct Home: View {
                 Label("タイトル", systemImage: "")
                     .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
                 Label("新規スレッド作成", systemImage: "")
-                TextField(/*@START_MENU_TOKEN@*/"Placeholder"/*@END_MENU_TOKEN@*/, text: $newCreate)
+                TextField("スレッド名を入力してください", text: $newCreate)
                     .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
                 Button(action: {
                     
@@ -68,6 +68,15 @@ struct Home: View {
             }
             .onAppear {
                 
+                db.collection("chat_rooms").getDocuments() { (querySnapshot, err) in
+                    if let err = err {
+                        print("Error getting documents: \(err)")
+                    } else {
+                        for document in querySnapshot!.documents {
+                            print("\(document.documentID) => \(document.data())")
+                        }
+                    }
+                }
             }
             
             
