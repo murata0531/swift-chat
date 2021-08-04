@@ -13,7 +13,7 @@ import FirebaseDatabase
 
 struct Home: View {
     
-
+    @State var isActiveRoom = false
     
     @State var isActiveLogin = false
     @State var newCreate = ""
@@ -33,25 +33,30 @@ struct Home: View {
             let photoURL = user.photoURL
             
             VStack {
-                
-                Label("タイトル", systemImage: "")
-                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+//                Label("タイトル", systemImage: "")
+//                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
                 Label("新規スレッド作成", systemImage: "")
                 TextField("スレッド名を入力してください", text: $newCreate)
                     .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                NavigationLink(
+                    destination: ChatRoom(),
+                    isActive: $isActiveRoom){
+                    EmptyView()
+                }
                 Button(action: {
                     
                     if self.newCreate != "" {
-                        
                         let dt = Date()
                         let dateFormatter = DateFormatter()
                         dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
                         let room = dateFormatter.string(from: dt)
                         
                         let newCreateRoom = newCreate + room
-//                        ref.child("chat_rooms").child(newCreateRoom).setValue(["id": newCreateRoom,"room_name": newCreate])
                         let data: [String: Any] = ["name":newCreate, "time": room]
                         db.collection("chat_rooms").document(newCreateRoom).setData(data, merge: true)
+                        
+                        self.isActiveRoom = true
+                        
                     }
                     self.newCreate = ""
                 }) {
@@ -61,19 +66,21 @@ struct Home: View {
                 Spacer()
                 
                 List(rooms, id: \.self) { item in
-                    Text(item)
+                    NavigationLink(destination: ChatRoom()) {
+                        Text(item)
+                    }
                 }
-                
-                
             }
             .onAppear {
                 
+                rooms.removeAll()
                 db.collection("chat_rooms").getDocuments() { (querySnapshot, err) in
                     if let err = err {
                         print("Error getting documents: \(err)")
                     } else {
                         for document in querySnapshot!.documents {
-                            print("\(document.documentID) => \(document.data())")
+                            //print("\(document.documentID) => \(document.data())")
+                            rooms.append(document.documentID)
                         }
                     }
                 }
