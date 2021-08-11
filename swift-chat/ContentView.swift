@@ -23,57 +23,49 @@ struct ContentView: View {
     @State private var errorMessage = ""
     
     var body: some View {
-        NavigationView {
-        HStack {
-            Spacer().frame(width:50)
-            
-            VStack {
+            HStack {
+                Spacer().frame(width:50)
                 
-                TextField("メールアドレス",text:$mail).textFieldStyle(RoundedBorderTextFieldStyle())
-                SecureField("パスワード",text:$pass).textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                NavigationLink(
-                    destination: Home(),
-                    isActive: $isActiveHome){
-                    EmptyView()
-                }
-                
-                Button(action: {
-                    self.errorMessage = ""
-                    if self.mail.isEmpty {
-                        self.errorMessage = "メールアドレスが入力されてません"
-                        self.isError = true
-                        self.isShowAlert = true
-                    }else if self.pass.isEmpty {
-                        self.errorMessage = "パスワードが入力されていません"
-                        self.isError = true
-                        self.isShowAlert = true
-                    }else {
-                        self.signIn()
-                        
-                        if self.isError == false {
-                            self.isActiveHome = true
-                        }
+                VStack {
+                    
+                    TextField("メールアドレス",text:$mail).textFieldStyle(RoundedBorderTextFieldStyle())
+                    SecureField("パスワード",text:$pass)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    NavigationLink(
+                        destination: Home(),
+                        isActive: $isActiveHome){
+                        EmptyView()
                     }
                     
-                }){
-                    Text("ログイン")
-                }
-//                .alert(isPresented: $isShowAlert){
-//                    if self.isError {
-//                        return Alert(title:Text(""),message:Text(self.errorMessage),dismissButton: .destructive(Text("OK")))
-//                    }else {
-//                        return Alert(title:Text(""),message: Text("ログイン"),dismissButton: .default(Text("ok")))
-//                    }
-//
-//                }
-                
+                    Button(action: {
+                        self.errorMessage = ""
+                        if self.mail.isEmpty {
+                            self.errorMessage = "メールアドレスが入力されてません"
+                            self.isError = true
+                            self.isShowAlert = true
+                        }else if self.pass.isEmpty {
+                            self.errorMessage = "パスワードが入力されていません"
+                            self.isError = true
+                            self.isShowAlert = true
+                        }else {
+                            self.signIn()
+                            
+                            if self.isError == false {
+                                self.isActiveHome = true
+                            }
+                        }
+                        
+                    }){
+                        Text("ログイン")
+                    }
+                    Spacer().frame(height:100)
                     NavigationLink(destination: Register()) {
-                        Text("アカウント登録")
+                        Text("アカウントをお持ちでない方はこちら")
+                            .multilineTextAlignment(.center)
                     }
                 }
+                Spacer().frame(width:50)
             }
-        }
     }
     
     private func signIn(){
@@ -119,7 +111,6 @@ struct Register: View {
     @State private var errorMessage = ""
     
     var body: some View {
-        NavigationView {
         HStack {
             Spacer().frame(width:50)
             VStack {
@@ -160,18 +151,15 @@ struct Register: View {
                         return Alert(title:Text(""),message: Text("登録されました"),dismissButton: .default(Text("OK")))
                     }
                 }
-                Spacer()
-                HStack{
-                    NavigationLink(destination: ContentView()) {
-                        Text("ログイン画面へ")
-                    }
+                Spacer().frame(height:100)
+                NavigationLink(destination: ContentView()) {
+                    Text("アカウントをお持ちの方はこちら")
+                        .multilineTextAlignment(.center)
                 }
             }
-            
-            
             Spacer().frame(width:50)
         }
-        }
+        
     }
     
     private func signup(){
