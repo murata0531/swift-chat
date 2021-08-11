@@ -24,7 +24,6 @@ struct Home: View {
     let db = Firestore.firestore()
 
     var body: some View {
-
         VStack {
 //                Label("タイトル", systemImage: "")
 //                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
@@ -92,8 +91,6 @@ struct Home: View {
                 }
             }
         }
-            
-            
     }
 }
 
