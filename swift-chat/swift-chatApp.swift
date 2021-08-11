@@ -26,7 +26,9 @@ struct swift_chatApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationView {
+                ContentView()
+            }
         }
     }
 }
