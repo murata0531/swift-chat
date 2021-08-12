@@ -66,6 +66,11 @@ struct ContentView: View {
                 }
                 Spacer().frame(width:50)
             }
+            .onAppear {
+                if Auth.auth().currentUser != nil {
+                    self.isActiveHome = true
+                }
+            }
     }
     
     private func signIn(){
@@ -103,6 +108,8 @@ struct ContentView: View {
 //アカウント登録画面
 struct Register: View {
     
+    @State var isActiveHome = false
+
     @State private var mail = ""
     @State private var pass = ""
     @State private var pass_confirm = ""
@@ -117,7 +124,11 @@ struct Register: View {
                 TextField("メールアドレス",text:$mail).textFieldStyle(RoundedBorderTextFieldStyle())
                 SecureField("パスワード",text:$pass).textFieldStyle(RoundedBorderTextFieldStyle())
                 SecureField("パスワード確認",text:$pass_confirm).textFieldStyle(RoundedBorderTextFieldStyle())
-                
+                NavigationLink(
+                    destination: Home(),
+                    isActive: $isActiveHome){
+                    EmptyView()
+                }
                 Button(action: {
                     self.errorMessage = ""
                     if self.mail.isEmpty {
@@ -158,6 +169,11 @@ struct Register: View {
                 }
             }
             Spacer().frame(width:50)
+        }
+        .onAppear {
+            if Auth.auth().currentUser != nil {
+                self.isActiveHome = true
+            }
         }
         
     }
