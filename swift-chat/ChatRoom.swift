@@ -13,17 +13,38 @@ import FirebaseDatabase
 struct ChatRoom: View {
     
     @State var isActiveLogin = false
-
-    let room_id:String
     @State private var isInActiveLogin = false
+    @State var rooms = [String]()
+    @State private var message = ""
+    
+    let room_id:String
+    let db = Firestore.firestore()
 
     var body: some View {
-        
         VStack {
             NavigationLink(
                 destination: ContentView(),
                 isActive: $isInActiveLogin){
                 EmptyView()
+            }
+            
+            List(rooms, id: \.self) { item in
+                NavigationLink(destination: ChatRoom(room_id: String(item))) {
+                    Text(item)
+                }
+            }
+            
+            Spacer()
+            
+            HStack {
+                TextField("RoundedBorderTextFieldStyle", text: $message)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                Button(action: {
+                    print("a")
+                }){
+                    Text("送信")
+                }
             }
         }
         .onAppear {
@@ -36,6 +57,20 @@ struct ChatRoom: View {
               // ...
                 self.isInActiveLogin = true
             }
+            
+            rooms.removeAll()
+            db.collection("chat_data").document(room_id)
+                .addSnapshotListener { documentSnapshot, error in
+                  guard let document = documentSnapshot else {
+                    print("Error fetching document: \(error!)")
+                    return
+                  }
+                  guard let data = document.data() else {
+                    print("Document data was empty.")
+                    return
+                  }
+                    rooms.append(String(data.count))
+                }
         }
     }
 }
