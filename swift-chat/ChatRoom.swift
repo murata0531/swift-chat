@@ -87,16 +87,17 @@ struct ChatRoom: View {
             
             db.collection("chat_data").document(room_id)
                 .addSnapshotListener { documentSnapshot, error in
-                  guard let document = documentSnapshot else {
-                    print("Error fetching document: \(error!)")
-                    return
-                  }
-                  guard let data = document.data() else {
-                    print("Document data was empty.")
-                    return
-                  }
-                    rooms.append(String(data.count))
-                    print("Current data: \(data)")
+                    guard let document = documentSnapshot else {
+                        print("Error fetching document: \(error!)")
+                        return
+                    }
+                    guard let data = document.data() else {
+                        print("Document data was empty.")
+                        return
+                    }
+                    let value = data["message"] as? String ?? ""
+                    rooms.append(value)
+                    print("Current data: \(value)")
                 }
         }
     }
