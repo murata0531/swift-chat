@@ -19,6 +19,7 @@ struct ChatRoom: View {
     @State private var enable: Bool = false
     @State private var color = Color.gray
     @State private var user_id:String = ""
+    @State private var room_name:String = ""
     
     let room_id:String
     let db = Firestore.firestore()
@@ -30,15 +31,17 @@ struct ChatRoom: View {
                 isActive: $isInActiveLogin){
                 EmptyView()
             }
-            
+//            Label("スレッド　：　\(room_name)", systemImage: "")
+//                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
             List(rooms, id: \.self) { item in
                 Text(item)
             }
+            .navigationBarTitle("スレッド　：　\(room_name)")
             
             Spacer()
             
             HStack {
-                TextField("RoundedBorderTextFieldStyle", text: $message)
+                TextField("メッセージを入力", text: $message)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .onChange(of: message){ value in
                         if value == "" {
@@ -83,6 +86,29 @@ struct ChatRoom: View {
             } else {
               // No user is signed in.
                 self.isInActiveLogin = true
+            }
+            
+            let room_docRef = db.collection("chat_rooms").document(room_id)
+            room_docRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    guard let data = document.data() else {
+                        print("Document data was empty.")
+                        return
+                    }
+                    self.room_name = data["name"] as? String ?? ""
+                } else {
+                    print("Document does not exist")
+                }
+            }
+            let docRef = db.collection("chat_data").document(room_id)
+
+            docRef.getDocument { (document, error) in
+                if let document = document, document.exists {
+                    let dataDescription = document.data().map(String.init(describing:)) ?? "nil"
+                    print("Document data: \(dataDescription)")
+                } else {
+                    print("Document does not exist")
+                }
             }
             
             db.collection("chat_data").document(room_id)
