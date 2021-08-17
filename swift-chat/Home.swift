@@ -20,7 +20,7 @@ struct Home: View {
     @State private var message = ""
     @State private var messageCount = 0
 //    @State var rooms:Dictionary<String,String> = [:]
-    @State var rooms = [String]()
+    @State var rooms:[Room] = []
     let db = Firestore.firestore()
 
     var body: some View {
@@ -28,8 +28,10 @@ struct Home: View {
 //                Label("タイトル", systemImage: "")
 //                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
             Label("新規スレッド作成", systemImage: "")
+                .frame(height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
             TextField("スレッド名を入力してください", text: $newCreate)
-                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .frame(height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
             NavigationLink(
                 destination: ChatRoom(room_id: String(self.cuurent_room)),
                 isActive: $isActiveRoom){
@@ -50,7 +52,11 @@ struct Home: View {
                     
                     let newCreateRoom = newCreate + room
                     let data: [String: Any] = ["name":newCreate, "time": room]
-                    db.collection("chat_rooms").document(newCreateRoom).setData(data, merge: true)
+                    db.collection("chat_rooms").document(newCreateRoom).setData(data, merge: true){ err in
+                        if let err = err {
+                            print("Error writing document: \(err)")
+                        } 
+                    }
                     
                     self.cuurent_room = String(newCreateRoom)
                     self.isActiveRoom = true
@@ -63,9 +69,9 @@ struct Home: View {
             
             Spacer()
             
-            List(rooms, id: \.self) { item in
-                NavigationLink(destination: ChatRoom(room_id: String(item))) {
-                    Text(item)
+            List(rooms) { item in
+                NavigationLink(destination: ChatRoom(room_id: item.rid)){
+                    Text("　【\(item.name)】\(item.time)")
                 }
             }
         }
@@ -86,7 +92,11 @@ struct Home: View {
                 } else {
                     for document in querySnapshot!.documents {
                         //print("\(document.documentID) => \(document.data())")
-                        rooms.append(document.documentID)
+                        let room_data = document.data()
+                        //rooms.append(document.documentID)
+                        rooms.append(Room(rid: document.documentID,
+                                          name: room_data["name"] as? String ?? "",
+                                          time: room_data["time"] as? String ?? ""))
                     }
                 }
             }
@@ -94,9 +104,11 @@ struct Home: View {
     }
 }
 
-struct Rooms: Identifiable {
+struct Room: Identifiable {
     let id = UUID()
+    let rid: String
     let name: String
+    let time: String
 }
 
 struct Home_Previews: PreviewProvider {
