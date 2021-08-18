@@ -123,7 +123,7 @@ struct ChatRoom: View {
                     }
                     let value = data["message"] as? String ?? ""
                     rooms.append(value)
-                    print("Current data: \(value)")
+//                    print("Current data: \(value)")
                 }
         }
     }
