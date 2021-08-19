@@ -61,7 +61,18 @@ struct ChatRoom: View {
                     let room = dateFormatter.string(from: dt)
                     let data: [String: Any] = ["uid": self.user_id, "time": room, "message": self.message]
                     
-                    db.collection("chat_data").document(room_id).setData(data, merge: true){ err in
+//                    db.collection("chat_data").document(room_id).setData(data, merge: true){ err in
+//                        if let err = err {
+//                            print("Error writing document: \(err)")
+//                        } else {
+//                            self.message = ""
+//                        }
+//                    }
+                    db.collection("chat_data")
+                        .document(room_id)
+                        .collection(room_id)
+                        .document(room)
+                        .setData(data, merge: true){ err in
                         if let err = err {
                             print("Error writing document: \(err)")
                         } else {
@@ -100,31 +111,32 @@ struct ChatRoom: View {
                     print("Document does not exist")
                 }
             }
-            let docRef = db.collection("chat_data").document(room_id)
-
-            docRef.getDocument { (document, error) in
-                if let document = document, document.exists {
-                    let dataDescription = document.data().map(String.init(describing:)) ?? "nil"
-                    print("Document data: \(dataDescription)")
-                } else {
-                    print("Document does not exist")
-                }
-            }
+//            let docRef = db.collection("chat_data").document(room_id).collection("")
+//
+//            docRef.getDocuments() { (querySnapshot, err) in
+//                if let err = err {
+//                    print("Error getting documents: \(err)")
+//                } else {
+//                    for document in querySnapshot!.documents {
+//                        print("\(document.documentID) => \(document.data())")
+//                    }
+//                }
+//            }
             
-            db.collection("chat_data").document(room_id)
-                .addSnapshotListener { documentSnapshot, error in
-                    guard let document = documentSnapshot else {
-                        print("Error fetching document: \(error!)")
-                        return
-                    }
-                    guard let data = document.data() else {
-                        print("Document data was empty.")
-                        return
-                    }
-                    let value = data["message"] as? String ?? ""
-                    rooms.append(value)
-//                    print("Current data: \(value)")
-                }
+//            db.collection("chat_data").document(room_id).collection(room_id).document()
+//                .addSnapshotListener { documentSnapshot, error in
+//                    guard let document = documentSnapshot else {
+//                        print("Error fetching document: \(error!)")
+//                        return
+//                    }
+//                    guard let data = document.data() else {
+//                        print("Document data was empty.")
+//                        return
+//                    }
+//                    let value = data["message"] as? String ?? ""
+//                    rooms.append(value)
+//                    print("Current data: \(document)")
+//                }
         }
     }
 }
