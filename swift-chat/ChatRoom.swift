@@ -14,12 +14,12 @@ struct ChatRoom: View {
     
     @State private var isActiveLogin = false
     @State private var isInActiveLogin = false
-    @State private var rooms = [String]()
     @State private var message = ""
     @State private var enable: Bool = false
     @State private var color = Color.gray
     @State private var user_id:String = ""
     @State private var room_name:String = ""
+    @State private var messages:[Message] = []
     
     let room_id:String
     let db = Firestore.firestore()
@@ -33,8 +33,11 @@ struct ChatRoom: View {
             }
 //            Label("スレッド　：　\(room_name)", systemImage: "")
 //                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-            List(rooms, id: \.self) { item in
-                Text(item)
+//            List(messages, id: \.self) { item in
+//                Text(item)
+//            }
+            List(messages) { item in
+                Text(item.message)
             }
             .navigationBarTitle("スレッド　：　\(room_name)")
             
@@ -111,17 +114,21 @@ struct ChatRoom: View {
                     print("Document does not exist")
                 }
             }
-//            let docRef = db.collection("chat_data").document(room_id).collection("")
-//
-//            docRef.getDocuments() { (querySnapshot, err) in
-//                if let err = err {
-//                    print("Error getting documents: \(err)")
-//                } else {
-//                    for document in querySnapshot!.documents {
-//                        print("\(document.documentID) => \(document.data())")
-//                    }
-//                }
-//            }
+            let docRef = db.collection("chat_data").document(room_id).collection(room_id)
+
+            docRef.getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                } else {
+                    for document in querySnapshot!.documents {
+                        print("\(document.documentID) => \(document.data())")
+                        let message_data = document.data()
+                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
+                                          message: message_data["message"] as? String ?? "",
+                                          time: message_data["time"] as? String ?? ""))
+                    }
+                }
+            }
             
 //            db.collection("chat_data").document(room_id).collection(room_id).document()
 //                .addSnapshotListener { documentSnapshot, error in
@@ -141,3 +148,9 @@ struct ChatRoom: View {
     }
 }
 
+struct Message: Identifiable {
+    let id = UUID()
+    let uid: String
+    let message: String
+    let time: String
+}
