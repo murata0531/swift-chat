@@ -20,7 +20,7 @@ struct Home: View {
     @State private var message = ""
     @State private var messageCount = 0
 //    @State var rooms:Dictionary<String,String> = [:]
-    @State var rooms:[Room] = []
+    @State private var rooms:[Room] = []
     let db = Firestore.firestore()
 
     var body: some View {
