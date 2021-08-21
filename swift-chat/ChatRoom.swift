@@ -20,6 +20,7 @@ struct ChatRoom: View {
     @State private var user_id:String = ""
     @State private var room_name:String = ""
     @State private var messages:[Message] = []
+    @State private var count = 0
     
     let room_id:String
     let db = Firestore.firestore()
@@ -64,13 +65,6 @@ struct ChatRoom: View {
                     let room = dateFormatter.string(from: dt)
                     let data: [String: Any] = ["uid": self.user_id, "time": room, "message": self.message]
                     
-//                    db.collection("chat_data").document(room_id).setData(data, merge: true){ err in
-//                        if let err = err {
-//                            print("Error writing document: \(err)")
-//                        } else {
-//                            self.message = ""
-//                        }
-//                    }
                     db.collection("chat_data")
                         .document(room_id)
                         .collection(room_id)
@@ -114,36 +108,60 @@ struct ChatRoom: View {
                     print("Document does not exist")
                 }
             }
-            let docRef = db.collection("chat_data").document(room_id).collection(room_id)
+           // let docRef = db.collection("chat_data").document(room_id).collection(room_id)
 
-            docRef.getDocuments() { (querySnapshot, err) in
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                } else {
-                    for document in querySnapshot!.documents {
-                        print("\(document.documentID) => \(document.data())")
-                        let message_data = document.data()
-                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
-                                          message: message_data["message"] as? String ?? "",
-                                          time: message_data["time"] as? String ?? ""))
-                    }
-                }
-            }
-            
-//            db.collection("chat_data").document(room_id).collection(room_id).document()
-//                .addSnapshotListener { documentSnapshot, error in
-//                    guard let document = documentSnapshot else {
-//                        print("Error fetching document: \(error!)")
-//                        return
+//            docRef.getDocuments() { (querySnapshot, err) in
+//                if let err = err {
+//                    print("Error getting documents: \(err)")
+//                } else {
+//                    for document in querySnapshot!.documents {
+//                        print("\(document.documentID) => \(document.data())")
+//                        let message_data = document.data()
+//                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
+//                                          message: message_data["message"] as? String ?? "",
+//                                          time: message_data["time"] as? String ?? ""))
 //                    }
+//                }
+//            }
+            
+            db.collection("chat_data").document(room_id).collection(room_id)
+                .addSnapshotListener { querySnapshot, error in
+                    guard let snapshot = querySnapshot else {
+                        print("Error fetching snapshots: \(error!)")
+                        return
+                    }
+                    snapshot.documentChanges.forEach { diff in
+                        if (diff.type == .added) {
+                            print("New city: \(diff.document.data())")
+                            let message_data = diff.document.data()
+                            messages.append(Message(uid: message_data["uid"] as? String ?? "",
+                                              message: message_data["message"] as? String ?? "",
+                                              time: message_data["time"] as? String ?? ""))
+                        }
+                        if (diff.type == .modified) {
+                            print("Modified: \(diff.document.data())")
+                        }
+                        if (diff.type == .removed) {
+                            print("Removed: \(diff.document.data())")
+                        }
+                    }
+                    
 //                    guard let data = document.data() else {
 //                        print("Document data was empty.")
 //                        return
 //                    }
+//                    print("Current data: \(data)")
+//                    for doc in document.documents {
+//                        let message_data = doc.data()
+//                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
+//                                          message: message_data["message"] as? String ?? "",
+//                                          time: message_data["time"] as? String ?? ""))
+//                    }
+                   
 //                    let value = data["message"] as? String ?? ""
 //                    rooms.append(value)
 //                    print("Current data: \(document)")
-//                }
+                }
         }
     }
 }
