@@ -13,6 +13,8 @@ import FirebaseDatabase
 
 struct Home: View {
     
+    @State private var showInputModal = false
+    
     @State private var cuurent_room = ""
     @State private var isActiveRoom = false
     @State private var isInActiveLogin = false
@@ -24,14 +26,8 @@ struct Home: View {
     let db = Firestore.firestore()
 
     var body: some View {
-        VStack {
-//                Label("タイトル", systemImage: "")
-//                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-            Label("新規スレッド作成", systemImage: "")
-                .frame(height: 20, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-            TextField("スレッド名を入力してください", text: $newCreate)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
+        
+        ZStack(alignment: .bottomTrailing) {
             NavigationLink(
                 destination: ChatRoom(room_id: String(self.cuurent_room)),
                 isActive: $isActiveRoom){
@@ -42,9 +38,14 @@ struct Home: View {
                 isActive: $isInActiveLogin){
                 EmptyView()
             }
-            Button(action: {
-                
-                if self.newCreate != "" {
+            List(rooms) { item in
+                NavigationLink(destination: ChatRoom(room_id: item.rid)){
+                    Text("　【\(item.name)】\n　\(item.time)")
+                }
+            }
+            .navigationBarTitle("スレッド一覧")
+            .sheet(isPresented: $showInputModal, onDismiss: {
+                if (self.newCreate != "") {
                     let dt = Date()
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "yMMMdHms", options: 0, locale: Locale(identifier: "ja_JP"))
@@ -55,25 +56,24 @@ struct Home: View {
                     db.collection("chat_rooms").document(newCreateRoom).setData(data, merge: true){ err in
                         if let err = err {
                             print("Error writing document: \(err)")
-                        } 
+                        }
                     }
                     
                     self.cuurent_room = String(newCreateRoom)
                     self.isActiveRoom = true
-                    
+                    self.newCreate = ""
                 }
-                self.newCreate = ""
             }) {
-                Text("作成する")
+                HomeInput(name: self.$newCreate)
             }
-            
-            Spacer()
-            
-            List(rooms) { item in
-                NavigationLink(destination: ChatRoom(room_id: item.rid)){
-                    Text("　【\(item.name)】\(item.time)")
-                }
+            Button(action: {
+                self.showInputModal.toggle()
+            }) {
+                Image(systemName: "plus.circle.fill")
+                    .resizable()
+                    .frame(width: 50, height: 50)
             }
+            .padding()
         }
         .onAppear {
             
