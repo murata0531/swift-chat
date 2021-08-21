@@ -32,13 +32,9 @@ struct ChatRoom: View {
                 isActive: $isInActiveLogin){
                 EmptyView()
             }
-//            Label("スレッド　：　\(room_name)", systemImage: "")
-//                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 50, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
-//            List(messages, id: \.self) { item in
-//                Text(item)
-//            }
+
             List(messages) { item in
-                Text(item.message)
+                Text(item.counter + ". " + item.message)
             }
             .navigationBarTitle("スレッド　：　\(room_name)")
             
@@ -108,21 +104,6 @@ struct ChatRoom: View {
                     print("Document does not exist")
                 }
             }
-           // let docRef = db.collection("chat_data").document(room_id).collection(room_id)
-
-//            docRef.getDocuments() { (querySnapshot, err) in
-//                if let err = err {
-//                    print("Error getting documents: \(err)")
-//                } else {
-//                    for document in querySnapshot!.documents {
-//                        print("\(document.documentID) => \(document.data())")
-//                        let message_data = document.data()
-//                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
-//                                          message: message_data["message"] as? String ?? "",
-//                                          time: message_data["time"] as? String ?? ""))
-//                    }
-//                }
-//            }
             
             db.collection("chat_data").document(room_id).collection(room_id)
                 .addSnapshotListener { querySnapshot, error in
@@ -132,11 +113,12 @@ struct ChatRoom: View {
                     }
                     snapshot.documentChanges.forEach { diff in
                         if (diff.type == .added) {
-                            print("New city: \(diff.document.data())")
+                            self.count += 1
                             let message_data = diff.document.data()
-                            messages.append(Message(uid: message_data["uid"] as? String ?? "",
-                                              message: message_data["message"] as? String ?? "",
-                                              time: message_data["time"] as? String ?? ""))
+                            messages.append(Message(counter: String(self.count),
+                                            uid: message_data["uid"] as? String ?? "",
+                                            message: message_data["message"] as? String ?? "",
+                                            time: message_data["time"] as? String ?? ""))
                         }
                         if (diff.type == .modified) {
                             print("Modified: \(diff.document.data())")
@@ -145,22 +127,6 @@ struct ChatRoom: View {
                             print("Removed: \(diff.document.data())")
                         }
                     }
-                    
-//                    guard let data = document.data() else {
-//                        print("Document data was empty.")
-//                        return
-//                    }
-//                    print("Current data: \(data)")
-//                    for doc in document.documents {
-//                        let message_data = doc.data()
-//                        messages.append(Message(uid: message_data["uid"] as? String ?? "",
-//                                          message: message_data["message"] as? String ?? "",
-//                                          time: message_data["time"] as? String ?? ""))
-//                    }
-                   
-//                    let value = data["message"] as? String ?? ""
-//                    rooms.append(value)
-//                    print("Current data: \(document)")
                 }
         }
     }
@@ -168,6 +134,7 @@ struct ChatRoom: View {
 
 struct Message: Identifiable {
     let id = UUID()
+    let counter: String
     let uid: String
     let message: String
     let time: String
