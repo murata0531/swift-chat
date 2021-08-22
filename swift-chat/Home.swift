@@ -40,7 +40,17 @@ struct Home: View {
             }
             List(rooms) { item in
                 NavigationLink(destination: ChatRoom(room_id: item.rid)){
-                    Text("　【\(item.name)】\n　\(item.time)")
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Text("\(item.time)").kerning(1)
+                        }
+                        Spacer().frame(height: 20)
+                        HStack {
+                            Text("【\(item.name)】").kerning(3).lineSpacing(5)
+                        }
+                        Spacer().frame(height: 20)
+                    }
                 }
             }
             .navigationBarTitle("スレッド一覧")
