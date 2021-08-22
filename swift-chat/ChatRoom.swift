@@ -34,9 +34,20 @@ struct ChatRoom: View {
             }
 
             List(messages) { item in
-                Text(item.counter + ". " + item.message)
+                VStack {
+                    HStack {
+                        Text(item.counter + ". ")
+                        Spacer()
+                        Text(item.time).kerning(1)
+                    }
+                    Spacer().frame(height: 20)
+                    HStack {
+                        Text(item.message).kerning(3).lineSpacing(5)
+                    }
+                    Spacer().frame(height: 20)
+                }
             }
-            .navigationBarTitle("スレッド　：　\(room_name)")
+            .navigationBarTitle("スレッドß　：　\(room_name)")
             
             Spacer()
             
