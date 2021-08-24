@@ -47,7 +47,7 @@ struct ChatRoom: View {
                     Spacer().frame(height: 20)
                 }
             }
-            .navigationBarTitle("スレッドß　：　\(room_name)")
+            .navigationBarTitle("スレッド　：　\(room_name)")
             
             Spacer()
             
@@ -89,6 +89,19 @@ struct ChatRoom: View {
                 .disabled(!enable)
                 .background(self.color)
             }
+            Button(action: {
+                
+                do {
+                    try Auth.auth().signOut()
+                    self.isInActiveLogin = true
+                } catch let signOutError as NSError {
+                    print("SignOut Error: %@", signOutError)
+                }
+                
+            }){
+                Text("ログアウト")
+            }
+            
         }
         .onAppear {
             
