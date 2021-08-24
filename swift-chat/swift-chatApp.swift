@@ -27,7 +27,11 @@ struct swift_chatApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView()
+                if Auth.auth().currentUser != nil {
+                    Home()
+                } else {
+                    ContentView()
+                }
             }
         }
     }
