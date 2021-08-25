@@ -47,7 +47,7 @@ struct ChatRoom: View {
                     Spacer().frame(height: 20)
                 }
             }
-            .navigationBarTitle("スレッド　：　\(room_name)")
+            .navigationBarTitle("\(room_name)")
             
             Spacer()
             
