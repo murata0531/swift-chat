@@ -66,6 +66,7 @@ struct ContentView: View {
                 }
                 Spacer().frame(width:50)
             }
+            .navigationBarBackButtonHidden(true)
             .onAppear {
                 if Auth.auth().currentUser != nil {
                     self.isActiveHome = true
