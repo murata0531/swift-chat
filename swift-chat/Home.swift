@@ -85,6 +85,7 @@ struct Home: View {
             }
             .padding()
         }
+        .navigationBarBackButtonHidden(true)
         .onAppear {
             
             if Auth.auth().currentUser != nil {
